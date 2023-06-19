@@ -1,0 +1,61 @@
+services:
+
+    app:
+        build:
+            context: .docker/nginx
+        ports:
+            - "80:8000"
+            - "443:8443"
+        depends_on:
+            - phpfpm
+        networks:
+            - sylius
+
+    phpfpm:
+        build:
+            context: .docker/php
+        environment:
+            APP_ENV: "dev"
+            DATABASE_URL: "mysql://root:mysql@mysql/sylius_%kernel.environment%?charset=utf8mb4"
+            PHP_DATE_TIMEZONE: "Europe/Warsaw"
+            PHP_XDEBUG_IDEKEY: "PHPSTORM"
+            MAILER_URL: "smtp://mailhog:1025"
+        volumes:
+            - ./backend:/app:delegated
+        depends_on:
+            - mysql
+        networks:
+            - sylius
+
+    mysql:
+        image: mysql:5.7
+        platform: linux/amd64
+        environment:
+            MYSQL_ROOT_PASSWORD: mysql
+        networks:
+            - sylius
+
+    mailhog:
+        image: mailhog/mailhog
+        ports:
+            - ${MAILHOG_PORT:-8025}:8025 # UI
+        networks:
+            - sylius
+
+    blackfire:
+        image: blackfire/blackfire:2
+        environment:
+            BLACKFIRE_LOG_LEVEL: 4
+            BLACKFIRE_SERVER_ID: ~
+            BLACKFIRE_SERVER_TOKEN: ~
+            BLACKFIRE_CLIENT_ID: ~
+            BLACKFIRE_CLIENT_TOKEN: ~
+            BLACKFIRE_DISABLE_LEGACY_PORT: 1
+        ports:
+            - ${BLACKFIRE_PORT:-8307}:8307
+        networks:
+            - sylius
+
+networks:
+    sylius:
+        driver: bridge
