@@ -4,10 +4,12 @@ services:
         build:
             context: .docker/nginx
         ports:
-            - "80:8000"
+            - "80:80"
             - "443:8443"
         depends_on:
             - phpfpm
+        volumes:
+            - ./backend:/var/www/symfony:delegated
         networks:
             - sylius
 
@@ -21,7 +23,7 @@ services:
             PHP_XDEBUG_IDEKEY: "PHPSTORM"
             MAILER_URL: "smtp://mailhog:1025"
         volumes:
-            - ./backend:/app:delegated
+            - ./backend:/var/www/symfony:delegated
         depends_on:
             - mysql
         networks:
