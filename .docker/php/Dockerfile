@@ -77,12 +77,6 @@ COPY conf/php.ini            /usr/local/etc/php/
 
 WORKDIR /var/www/symfony
 
-USER app:app
+RUN chown -R app:app /var/www/symfony
 
-# RUN version=$(php -r "echo PHP_MAJOR_VERSION.PHP_MINOR_VERSION;") \
-#     && architecture=$(uname -m) \
-#     && curl -A "Docker" -o /tmp/blackfire-probe.tar.gz -D - -L -s https://blackfire.io/api/v1/releases/probe/php/linux/$architecture/$version \
-#     && mkdir -p /tmp/blackfire \
-#     && tar zxpf /tmp/blackfire-probe.tar.gz -C /tmp/blackfire \
-#     && mv /tmp/blackfire/blackfire-*.so $(php -r "echo ini_get ('extension_dir');")/blackfire.so \
-#     && rm -rf /tmp/blackfire /tmp/blackfire-probe.tar.gz
+USER app:app
